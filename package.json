@@ -1,0 +1,16 @@
+{
+  "name": "magnit-fake-data",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^9.3.0",
+    "date-fns": "^4.1.0",
+    "postgres": "^3.4.5"
+  }
+}
