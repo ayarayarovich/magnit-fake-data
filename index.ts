@@ -341,16 +341,48 @@ steps.push(async () => {
       email: faker.internet.email(),
       factual_address: `Россия, г. ${faker.location.city()}, ${faker.location.street()}, д. ${faker.location.buildingNumber()}`,
       id_producer_country: c.id_country,
-      inn: Number(faker.string.numeric({length: 12, allowLeadingZeros: false})),
-      ogrn: Number(faker.string.numeric({length: 13, allowLeadingZeros: false})),
+      inn: Number(faker.string.numeric({ length: 12, allowLeadingZeros: false })),
+      ogrn: Number(faker.string.numeric({ length: 13, allowLeadingZeros: false })),
       legal_address: `Россия, г. ${faker.location.city()}, ${faker.location.street()}, д. ${faker.location.buildingNumber()}`,
-      phone_number: faker.phone.number({style: 'international'}),
+      phone_number: faker.phone.number({ style: "international" }),
       producer_name: faker.commerce.productName(),
     });
   }
 
   const result = await sql`
     insert into commodity_research.producers ${sql(entities)}
+  `;
+  console.log(result.count);
+});
+
+steps.push(async () => {
+  type Entity = CR.GoodsInput;
+
+  const producers = await sql<CR.Producers[]>`
+    select * from commodity_research.producers
+  `;
+  const categories = await sql<CR.CategoriesOfGoods[]>`
+    select * from commodity_research.categories_of_goods
+  `;
+
+  const entities: Entity[] = [];
+  for (let i = 0; i < 50; ++i) {
+    const c = categories[faker.number.int({ min: 0, max: categories.length - 1 })];
+    const p = producers[faker.number.int({ min: 0, max: producers.length - 1 })];
+    entities.push({
+      barcode: Number(faker.string.numeric({ length: 13, allowLeadingZeros: false })),
+      name: faker.commerce.productName(),
+      exp_date: faker.number.int({ min: 30, max: 120 }),
+      unit_of_measurement: "kg",
+      volume_in_units: faker.number.int({ min: 1, max: 30 }),
+      weight_in_kg: faker.number.int({ min: 10, max: 30 }),
+      id_category: c.id_category,
+      id_producer: p.id_producer,
+    });
+  }
+
+  const result = await sql`
+    insert into commodity_research.goods ${sql(entities)}
   `;
   console.log(result.count);
 });

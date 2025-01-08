@@ -185,33 +185,31 @@ const good_write_off_reasons = {
 export interface Goods {
   barcode: number;
   name: string | null;
-  id_producer_country: number | null;
-  id_producer: number | null;
   unit_of_measurement: string | null;
   volume_in_units: number | null;
   weight_in_kg: number | null;
   exp_date: number | null;
   id_category: number | null;
+  id_producer: number | null;
 }
 export interface GoodsInput {
   barcode: number;
   name?: string | null;
-  id_producer_country?: number | null;
-  id_producer?: number | null;
   unit_of_measurement?: string | null;
   volume_in_units?: number | null;
   weight_in_kg?: number | null;
   exp_date?: number | null;
   id_category?: number | null;
+  id_producer?: number | null;
 }
 const goods = {
   tableName: 'goods',
-  columns: ['barcode', 'name', 'id_producer_country', 'id_producer', 'unit_of_measurement', 'volume_in_units', 'weight_in_kg', 'exp_date', 'id_category'],
+  columns: ['barcode', 'name', 'unit_of_measurement', 'volume_in_units', 'weight_in_kg', 'exp_date', 'id_category', 'id_producer'],
   requiredForInsert: ['barcode'],
   primaryKey: 'barcode',
   foreignKeys: {
-    id_producer_country: { table: 'countries', column: 'id_country', $type: null as unknown as Countries },
     id_category: { table: 'categories_of_goods', column: 'id_category', $type: null as unknown as CategoriesOfGoods },
+    id_producer: { table: 'producers', column: 'id_producer', $type: null as unknown as Producers },
   },
   $type: null as unknown as Goods,
   $input: null as unknown as GoodsInput
