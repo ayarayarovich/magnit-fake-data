@@ -2,6 +2,11 @@
   "name": "magnit-fake-data",
   "module": "index.ts",
   "type": "module",
+  "scripts": {
+    "db:update:cr": "pg-to-ts generate -c postgresql://gen_user:%7Bqz3Kq7rG%7DB%2An%21@magnit-db.ayarayarovich.ru:5432/magnit -s commodity_research -o models/cr.ts",
+    "db:update:pa": "pg-to-ts generate -c postgresql://gen_user:%7Bqz3Kq7rG%7DB%2An%21@magnit-db.ayarayarovich.ru:5432/magnit -s personnel_accounting -o models/pa.ts",
+    "db:update:pricing": "pg-to-ts generate -c postgresql://gen_user:%7Bqz3Kq7rG%7DB%2An%21@magnit-db.ayarayarovich.ru:5432/magnit -s pricing -o models/pricing.ts"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
@@ -11,6 +16,7 @@
   "dependencies": {
     "@faker-js/faker": "^9.3.0",
     "date-fns": "^4.1.0",
+    "pg-to-ts": "^4.1.1",
     "postgres": "^3.4.5"
   }
 }

@@ -7,8 +7,9 @@ import {
   createSupplier,
 } from "./helpers";
 import type { Employee } from "./mdls";
-import { faker } from "@faker-js/faker";
+import { fakerRU as faker } from "@faker-js/faker";
 import { Pa, CR, Pricing } from "./models";
+import type { week_days } from "./types";
 
 const sql = postgres("postgresql://gen_user:{qz3Kq7rG}B*n!@194.87.226.194:5432/magnit");
 
@@ -161,7 +162,7 @@ steps.push(async () => {
   const emps = await sql<Employee[]>`
     select * from personnel_accounting.employees
   `;
-  const weekDays: Pa.week_days[] = [
+  const weekDays: week_days[] = [
     "Monday",
     "Tuesday",
     "Wednesday",
@@ -214,6 +215,118 @@ steps.push(async () => {
   console.log(result.count);
 });
 
+steps.push(async () => {
+  type Entity = CR.CountriesInput;
+  const createEntity = (): Entity => {
+    return {
+      id_country: Number(faker.location.countryCode("numeric")),
+      country_name: faker.location.country(),
+    };
+  };
+
+  const entities = faker.helpers.multiple(createEntity, { count: 20 });
+  const result = await sql`
+    insert into commodity_research.countries ${sql(entities)}
+  `;
+  console.log(result.count);
+});
+
+steps.push(async () => {
+  type Entity = CR.CategoriesOfGoodsInput;
+
+  const categories = faker.helpers.uniqueArray(faker.commerce.department, 50);
+  const entities: Entity[] = [];
+  for (let i = 0; i < 20; ++i) {
+    entities.push({
+      category_name: categories[i],
+      max_fluctuation_in_perc: faker.number.int({ min: 0, max: 1000 }) / 100,
+    });
+  }
+  const result = await sql`
+    insert into commodity_research.categories_of_goods ${sql(entities)}
+  `;
+  console.log(result.count);
+});
+
+steps.push(async () => {
+  type Entity = CR.CompanyHeadOfficesInput;
+
+  const emps = await sql<Employee[]>`
+    select * from personnel_accounting.employees
+  `;
+
+  const entities: Entity[] = [];
+  for (let i = 0; i < 50; ++i) {
+    const [emp] = emps.splice(faker.number.int({ min: 0, max: emps.length - 1 }), 1);
+    entities.push({
+      office_name: faker.company.name(),
+      address: `Россия, г. ${faker.location.city()}, ${faker.location.street()}, д. ${faker.location.buildingNumber()}`,
+      id_director: emp.employee_id,
+    });
+  }
+
+  const result = await sql`
+    insert into commodity_research.company_head_offices ${sql(entities)}
+  `;
+  console.log(result.count);
+});
+
+steps.push(async () => {
+  type Entity = CR.DistributionCentresInput;
+
+  const emps = await sql<Employee[]>`
+    select * from personnel_accounting.employees
+  `;
+
+  const entities: Entity[] = [];
+  for (let i = 0; i < 50; ++i) {
+    const [emp] = emps.splice(faker.number.int({ min: 0, max: emps.length - 1 }), 1);
+    entities.push({
+      id_centre_director: emp.employee_id,
+      centre_address: `Россия, г. ${faker.location.city()}, ${faker.location.street()}, д. ${faker.location.buildingNumber()}`,
+      centre_name: faker.company.name(),
+      loader_amount: faker.number.int({ min: 2000, max: 10000 }),
+      merchandiser_amount: faker.number.int({ min: 2000, max: 10000 }),
+      refrigerator_amount: faker.number.int({ min: 2000, max: 10000 }),
+      shelf_amount: faker.number.int({ min: 2000, max: 10000 }),
+      storeman_amount: faker.number.int({ min: 2000, max: 10000 }),
+      total_area: faker.number.int({ min: 200, max: 500 }),
+      total_spaces: faker.number.int({ min: 2000, max: 10000 }),
+    });
+  }
+
+  const result = await sql`
+    insert into commodity_research.distribution_centres ${sql(entities)}
+  `;
+  console.log(result.count);
+});
+
+steps.push(async () => {
+  type Entity = CR.StoresInput;
+
+  const emps = await sql<Employee[]>`
+    select * from personnel_accounting.employees
+  `;
+
+  const entities: Entity[] = [];
+  for (let i = 0; i < 50; ++i) {
+    const [emp] = emps.splice(faker.number.int({ min: 0, max: emps.length - 1 }), 1);
+    entities.push({
+      id_store_director: emp.employee_id,
+      merchandiser_amount: faker.number.int({ min: 10, max: 20 }),
+      seller_amount: faker.number.int({ min: 10, max: 20 }),
+      store_address: `Россия, г. ${faker.location.city()}, ${faker.location.street()}, д. ${faker.location.buildingNumber()}`,
+      store_name: faker.company.name(),
+      storeman_amount: faker.number.int({ min: 10, max: 20 }),
+    });
+  }
+
+  const result = await sql`
+    insert into commodity_research.stores ${sql(entities)}
+  `;
+  console.log(result.count);
+});
+
 // Execution
 if (EXECUTE_ONLY_LAST_STEP) {
   const step = steps[steps.length - 1];
@@ -230,4 +343,5 @@ if (EXECUTE_ONLY_LAST_STEP) {
 
 console.log("done");
 
+await sql.end();
 process.exit(0);
