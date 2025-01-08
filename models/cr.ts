@@ -211,7 +211,6 @@ const goods = {
   primaryKey: 'barcode',
   foreignKeys: {
     id_producer_country: { table: 'countries', column: 'id_country', $type: null as unknown as Countries },
-    id_producer: { table: 'producers', column: 'id_producer', $type: null as unknown as Producers },
     id_category: { table: 'categories_of_goods', column: 'id_category', $type: null as unknown as CategoriesOfGoods },
   },
   $type: null as unknown as Goods,
@@ -396,33 +395,33 @@ const noncompliance_report = {
 
 // Table producers
 export interface Producers {
-  id_producer: number;
   producer_name: string | null;
   id_producer_country: number | null;
   inn: number | null;
   ogrn: number | null;
   legal_address: string | null;
   factual_address: string | null;
-  phone_number: number | null;
+  phone_number: string | null;
   email: string | null;
   id_contact_person: number | null;
+  id_producer: number;
 }
 export interface ProducersInput {
-  id_producer: number;
   producer_name?: string | null;
   id_producer_country?: number | null;
   inn?: number | null;
   ogrn?: number | null;
   legal_address?: string | null;
   factual_address?: string | null;
-  phone_number?: number | null;
+  phone_number?: string | null;
   email?: string | null;
   id_contact_person?: number | null;
+  id_producer?: number;
 }
 const producers = {
   tableName: 'producers',
-  columns: ['id_producer', 'producer_name', 'id_producer_country', 'inn', 'ogrn', 'legal_address', 'factual_address', 'phone_number', 'email', 'id_contact_person'],
-  requiredForInsert: ['id_producer'],
+  columns: ['producer_name', 'id_producer_country', 'inn', 'ogrn', 'legal_address', 'factual_address', 'phone_number', 'email', 'id_contact_person', 'id_producer'],
+  requiredForInsert: [],
   primaryKey: 'id_producer',
   foreignKeys: { id_producer_country: { table: 'countries', column: 'id_country', $type: null as unknown as Countries }, },
   $type: null as unknown as Producers,
@@ -481,21 +480,24 @@ const reception_status = {
 
 // Table sales_floor_income_goods
 export interface SalesFloorIncomeGoods {
-  id_income: number | null;
+  id_income: number;
   barcode: number | null;
   quantity: number | null;
 }
 export interface SalesFloorIncomeGoodsInput {
-  id_income?: number | null;
+  id_income: number;
   barcode?: number | null;
   quantity?: number | null;
 }
 const sales_floor_income_goods = {
   tableName: 'sales_floor_income_goods',
   columns: ['id_income', 'barcode', 'quantity'],
-  requiredForInsert: [],
-  primaryKey: null,
-  foreignKeys: { id_income: { table: 'sales_floor_incomes', column: 'id_income', $type: null as unknown as SalesFloorIncomes }, },
+  requiredForInsert: ['id_income'],
+  primaryKey: 'id_income',
+  foreignKeys: {
+    id_income: { table: 'sales_floor_incomes', column: 'id_income', $type: null as unknown as SalesFloorIncomes },
+    barcode: { table: 'goods', column: 'barcode', $type: null as unknown as Goods },
+  },
   $type: null as unknown as SalesFloorIncomeGoods,
   $input: null as unknown as SalesFloorIncomeGoodsInput
 } as const;
@@ -522,20 +524,20 @@ const sales_floor_incomes = {
 // Table sales_floors
 export interface SalesFloors {
   id_sales_floor: number;
-  id_store: number | null;
+  id_subdivision: number | null;
   total_spaces: number | null;
 }
 export interface SalesFloorsInput {
   id_sales_floor?: number;
-  id_store?: number | null;
+  id_subdivision?: number | null;
   total_spaces?: number | null;
 }
 const sales_floors = {
   tableName: 'sales_floors',
-  columns: ['id_sales_floor', 'id_store', 'total_spaces'],
+  columns: ['id_sales_floor', 'id_subdivision', 'total_spaces'],
   requiredForInsert: [],
   primaryKey: 'id_sales_floor',
-  foreignKeys: { id_store: { table: 'stores', column: 'id_store', $type: null as unknown as Stores }, },
+  foreignKeys: { id_subdivision: { table: 'subdivisions', column: 'id_subdivision', $type: null as unknown as Subdivisions }, },
   $type: null as unknown as SalesFloors,
   $input: null as unknown as SalesFloorsInput
 } as const;
@@ -613,20 +615,20 @@ const store_category_changes = {
 // Table store_local_storage
 export interface StoreLocalStorage {
   id_local_storage: number;
-  id_store: number | null;
+  id_subdivision: number | null;
   total_spaces: number | null;
 }
 export interface StoreLocalStorageInput {
   id_local_storage?: number;
-  id_store?: number | null;
+  id_subdivision?: number | null;
   total_spaces?: number | null;
 }
 const store_local_storage = {
   tableName: 'store_local_storage',
-  columns: ['id_local_storage', 'id_store', 'total_spaces'],
+  columns: ['id_local_storage', 'id_subdivision', 'total_spaces'],
   requiredForInsert: [],
   primaryKey: 'id_local_storage',
-  foreignKeys: { id_store: { table: 'stores', column: 'id_store', $type: null as unknown as Stores }, },
+  foreignKeys: { id_subdivision: { table: 'subdivisions', column: 'id_subdivision', $type: null as unknown as Subdivisions }, },
   $type: null as unknown as StoreLocalStorage,
   $input: null as unknown as StoreLocalStorageInput
 } as const;
@@ -778,7 +780,6 @@ const transportation_documents = {
   foreignKeys: {
     id_distribution_centre: { table: 'distribution_centres', column: 'id_distribution_centre', $type: null as unknown as DistributionCentres },
     id_truck: { table: 'trucks', column: 'id_truck', $type: null as unknown as Trucks },
-    id_local_storage: { table: 'store_local_storage', column: 'id_local_storage', $type: null as unknown as StoreLocalStorage },
     id_sender: { table: 'employees', column: 'employee_id', $type: null as unknown /* employees */ },
     id_receiver: { table: 'employees', column: 'employee_id', $type: null as unknown /* employees */ },
   },

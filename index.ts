@@ -327,6 +327,34 @@ steps.push(async () => {
   console.log(result.count);
 });
 
+steps.push(async () => {
+  type Entity = CR.ProducersInput;
+
+  const cc = await sql<CR.Countries[]>`
+    select * from commodity_research.countries
+  `;
+
+  const entities: Entity[] = [];
+  for (let i = 0; i < 50; ++i) {
+    const c = cc[faker.number.int({ min: 0, max: cc.length - 1 })];
+    entities.push({
+      email: faker.internet.email(),
+      factual_address: `Россия, г. ${faker.location.city()}, ${faker.location.street()}, д. ${faker.location.buildingNumber()}`,
+      id_producer_country: c.id_country,
+      inn: Number(faker.string.numeric({length: 12, allowLeadingZeros: false})),
+      ogrn: Number(faker.string.numeric({length: 13, allowLeadingZeros: false})),
+      legal_address: `Россия, г. ${faker.location.city()}, ${faker.location.street()}, д. ${faker.location.buildingNumber()}`,
+      phone_number: faker.phone.number({style: 'international'}),
+      producer_name: faker.commerce.productName(),
+    });
+  }
+
+  const result = await sql`
+    insert into commodity_research.producers ${sql(entities)}
+  `;
+  console.log(result.count);
+});
+
 // Execution
 if (EXECUTE_ONLY_LAST_STEP) {
   const step = steps[steps.length - 1];
